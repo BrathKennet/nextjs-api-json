@@ -1,10 +1,10 @@
 
-import data from '../../../data/clientes.json'
+import data from '../../../data/productos.json'
 import asyncHandler from '@/pages/libs/async.handler';
 import fs from "fs";
 import path from "path";
 
-const clientePath = path.resolve("./data/clientes.json");
+const clientePath = path.resolve("./data/productos.json");
 
 const controllers = {
   GET: asyncHandler(async (req, res) => {

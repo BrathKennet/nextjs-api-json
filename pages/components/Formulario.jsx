@@ -2,83 +2,130 @@ import React from "react";
 import { useState, useEffect } from "react";
 import Error from "./Error";
 
-const Formulario = ({ clientes, setClientes, cliente, setCliente }) => {
+const Formulario = ({ productos, setProductos, producto, setProducto }) => {
   const [name, setName] = useState("");
-  const [dni, setDni] = useState("");
-  const [address, setAddress] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
   const [date, setDate] = useState("");
   const [image, setImage] = useState("");
+  const [uploadedImage, setUploadedImage] = useState(null);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    if (Object.keys(cliente).length > 0) {
-      setName(cliente.name);
-      setDni(cliente.dni);
-      setAddress(cliente.address);
-      setDate(cliente.date);
-      setImage(cliente.image);
+    if (Object.keys(producto).length > 0) {
+      setName(producto.name);
+      setDescription(producto.description);
+      setPrice(producto.price);
+      setDate(producto.date);
+      setImage(producto.image);
     }
-  }, [cliente]);
+  }, [producto]);
   const handlerSubmit = async (e) => {
     e.preventDefault();
 
-    if ([name, dni, address, date, image].includes("")) {
+    
+
+    /* if ([name, description, price, date].includes("")) {
       setError(true);
       return;
-    }
+    } */
 
     const objetoCliente = {
       name,
-      dni,
-      address,
+      description,
+      price,
       date,
-      image,
+      image: "",
     };
-    if (cliente.id) {
+    if (producto.id) {
       //MODO EDITAR
-      objetoCliente.id = cliente.id;
-      const clientesActualizados = clientes.map((clienteState) =>
-        clienteState.id === cliente.id ? objetoCliente : clienteState
-      );
-      setClientes(clientesActualizados);
-      setCliente({});
+      objetoCliente.id = producto.id;
 
-      const res = await fetch("../api/client", {
-        method: "PATCH",
-        headers: { "Content-type": "application/json" },
-        body: JSON.stringify(objetoCliente),
-      });
+      const formData = new FormData();
+      formData.append("image", e.target.image.files[0]);
 
-      const data = await res.json();
-
-      if (data) {
-        console.log("enviado");
-      } else {
-        console.log("error");
-      }
-    } else {
-      //MODO AGREGAR
-      objetoCliente.id = generarId();
-      setClientes([...clientes, objetoCliente]);
-
-      const res = await fetch("../api/client", {
+      const uploadImageResponse = await fetch("../api/upload-image", {
         method: "POST",
-        headers: { "Content-type": "application/json" },
-        body: JSON.stringify(objetoCliente),
+        body: formData,
       });
 
-      const data = await res.json();
+      if (uploadImageResponse.ok) {
+        const uploadImageJson = await uploadImageResponse.json();
+        const rutaimagen = uploadImageJson.imageUrl;
+        console.log("Ruta imagen:", rutaimagen);
 
-      if (data) {
-        console.log("enviado");
+        objetoCliente.image = "uploads/" + rutaimagen;
+
+        // La primera solicitud se completó correctamente
+        console.log("Imagen cargada exitosamente");
+
+        const productResponse = await fetch("../api/product", {
+          method: "PATCH",
+          headers: { "Content-type": "application/json" },
+          body: JSON.stringify(objetoCliente),
+        });
+
+        if (productResponse.ok) {
+          // La segunda solicitud se completó correctamente
+          console.log("Producto creado exitosamente");
+          const clientesActualizados = productos.map((clienteState) =>
+            clienteState.id === producto.id ? objetoCliente : clienteState
+          );
+          setProductos(clientesActualizados);
+          setProducto({});
+        } else {
+          console.error("Error al crear el producto:", productResponse.status);
+        }
       } else {
-        console.log("error");
+        console.error("Error al cargar la imagen:", uploadImageResponse.status);
       }
+
+    } else {
+
+      //MODO AGREGAR
+      
+      objetoCliente.id = generarId();
+
+      const formData = new FormData();
+      formData.append("image", e.target.image.files[0]);
+  
+      const uploadImageResponse = await fetch("../api/upload-image", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (uploadImageResponse.ok) {
+        const uploadImageJson = await uploadImageResponse.json();
+        const rutaimagen = uploadImageJson.imageUrl;
+        console.log("Ruta imagen:", rutaimagen);
+
+        objetoCliente.image = "uploads/" + rutaimagen;
+
+        // La primera solicitud se completó correctamente
+        console.log("Imagen cargada exitosamente");
+
+        const productResponse = await fetch("../api/product", {
+          method: "POST",
+          headers: { "Content-type": "application/json" },
+          body: JSON.stringify(objetoCliente),
+        });
+
+        if (productResponse.ok) {
+          // La segunda solicitud se completó correctamente
+          console.log("Producto creado exitosamente");
+          setProductos([...productos, objetoCliente]);
+        } else {
+          console.error("Error al crear el producto:", productResponse.status);
+        }
+      } else {
+        console.error("Error al cargar la imagen:", uploadImageResponse.status);
+      }
+
     }
 
     setName("");
-    setDni("");
-    setAddress("");
+    setDescription("");
+    setPrice("");
     setDate("");
     setImage("");
     setError(false);
@@ -88,6 +135,13 @@ const Formulario = ({ clientes, setClientes, cliente, setCliente }) => {
     const aleatorio = Math.random().toString(36).substring(2);
     return date + aleatorio;
   };
+
+
+  const handleImageUpload = (files) => {
+    const file = files[0];
+    setUploadedImage(file);
+  };
+
 
   return (
     <div className="w-full">
@@ -100,41 +154,47 @@ const Formulario = ({ clientes, setClientes, cliente, setCliente }) => {
             htmlFor="name"
             className=" font-bold text-[#06DA06] mb-1 block"
           >
-            Nombre:
+            Nombre del Producto:
           </label>
           <input
             id="name"
             type="text"
             className="w-full border-2 p-2 rounded-lg placeholder-gray-400 bg-black border-white text-white"
-            placeholder="Nombre del cliente"
+            placeholder="Nombre del producto"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
         </div>
         <div className="mb-3">
-          <label htmlFor="dni" className=" font-bold text-[#06DA06] mb-1 block">
-            DNI:
+          <label
+            htmlFor="description"
+            className=" font-bold text-[#06DA06] mb-1 block"
+          >
+            Descripción del Producto:
           </label>
           <input
-            id="dni"
+            id="description"
             type="text"
             className="w-full border-2 p-2 rounded-lg placeholder-gray-400 bg-black border-white text-white"
-            placeholder="DNI del cliente"
-            value={dni}
-            onChange={(e) => setDni(e.target.value)}
+            placeholder="Descripción del producto"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
           />
         </div>
         <div className="mb-3">
-          <label htmlFor="dni" className=" font-bold text-[#06DA06] mb-1 block">
-            Dirección:
+          <label
+            htmlFor="description"
+            className=" font-bold text-[#06DA06] mb-1 block"
+          >
+            Precio:
           </label>
           <input
-            id="dni"
-            type="text"
+            id="description"
+            type="number"
             className="w-full border-2 p-2 rounded-lg placeholder-gray-400 bg-black border-white text-white"
-            placeholder="Dirección del cliente"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
+            placeholder="Dirección del producto"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
           />
         </div>
         <div className="mb-3">
@@ -142,7 +202,7 @@ const Formulario = ({ clientes, setClientes, cliente, setCliente }) => {
             htmlFor="date"
             className=" font-bold text-[#06DA06] mb-1 block"
           >
-            Fecha de Nacimiento:
+            Fecha de Ingreso:
           </label>
           <input
             id="date"
@@ -154,24 +214,22 @@ const Formulario = ({ clientes, setClientes, cliente, setCliente }) => {
         </div>
         <div className="mb-3">
           <label
-            htmlFor="date"
+            htmlFor="image"
             className=" font-bold text-[#06DA06] mb-1 block"
           >
-            Imagen de Perfil:
+            Imagen del Producto:
           </label>
           <input
-            id="image"
-            type="text"
+            name="image"
+            type="file"
             className="w-full border-2 p-2 rounded-lg placeholder-gray-400 bg-black border-white text-white"
-            placeholder="URL de la imagen"
-            value={image}
-            onChange={(e) => setImage(e.target.value)}
+            onChange={(e) => handleImageUpload(e.target.files)}
           />
         </div>
         <div className="block text-center">
           <input
             type="submit"
-            value={cliente.id ? "Guardar Cliente" : "Agregar Cliente"}
+            value={producto.id ? "Guardar Producto" : "Agregar Producto"}
             className=" bg-black p-3 px-5 mt-3 text-[#06DA06] border border-[#06DA06] font-bold hover:bg-[#06DA06] hover:text-black cursor-pointer duration-300 rounded-xl"
           />
         </div>

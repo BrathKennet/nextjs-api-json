@@ -2,24 +2,24 @@ import { Inter } from "next/font/google";
 import Header from "./components/Header";
 import { useState, useEffect } from "react";
 import Formulario from "./components/Formulario";
-import ListadoClientes from "./components/ListadoClientes";
+import ListadoProductos from "./components/ListadoProductos";
 
 const inter = Inter({ subsets: ["latin"] });
 
 const Home = () => {
-  const [clientes, setClientes] = useState(null);
-  const [cliente, setCliente] = useState({});
+  const [productos, setProductos] = useState(null);
+  const [producto, setProducto] = useState({});
 
-  const eliminarCliente = async (clienteD) => {
+  const eliminarProducto = async (clienteD) => {
 
     const clienteid = clienteD.id
 
-    const clientesActualizados = clientes.filter(
-      (cliente) => cliente.id != clienteid
+    const clientesActualizados = productos.filter(
+      (producto) => producto.id != clienteid
     );
-    setClientes(clientesActualizados);
+    setProductos(clientesActualizados);
 
-    const res = await fetch(`/api/client/${clienteid}`, {
+    const res = await fetch(`/api/product/${clienteid}`, {
       method: "DELETE"
     });
 
@@ -34,12 +34,12 @@ const Home = () => {
 
   const getData = async () => {
     try {
-      const res = await fetch("/api/client");
+      const res = await fetch("/api/product");
       if (res.ok) {
         const dataGet = await res.json();
-        setClientes(dataGet);
+        setProductos(dataGet);
       } else {
-        throw new Error("Error al obtener los datos de los clientes");
+        throw new Error("Error al obtener los datos de los productos");
       }
     } catch (error) {
       console.log(error);
@@ -50,7 +50,7 @@ const Home = () => {
     getData();
   }, []);
 
-  if (!clientes) {
+  if (!productos) {
     return <div>Cargando...</div>;
   }
 
@@ -59,24 +59,24 @@ const Home = () => {
       <Header />
       <div className="grid grid-cols-3 w-full">
         <h2 className=" font-black text-2xl text-center text-[#06DA06] mb-10 ">
-          Formulario de Clientes
+          Formulario de Productos
         </h2>
         <h2 className=" font-black text-2xl text-center text-[#06DA06] mb-10 col-span-2">
-          Lista de Clientes
+          Lista de Productos
         </h2>
-        {clientes && (
+        {productos && (
           <>
             <Formulario
-              clientes={clientes}
-              setClientes={setClientes}
-              cliente={cliente}
-              setCliente={setCliente}
+              productos={productos}
+              setProductos={setProductos}
+              producto={producto}
+              setProducto={setProducto}
             />
 
-            <ListadoClientes
-              clientes={clientes}
-              setCliente={setCliente}
-              eliminarCliente={eliminarCliente}
+            <ListadoProductos
+              productos={productos}
+              setProducto={setProducto}
+              eliminarProducto={eliminarProducto}
             />
           </>
         )}
