@@ -1,9 +1,9 @@
 import { useState } from "react";
 
-function Producto({producto, setProducto, eliminarProducto}) {
+function Producto({ producto, setProducto, eliminarProducto }) {
   const [visible, setVisible] = useState(false);
 
-	/* const handleEliminar = ()=>{
+  /* const handleEliminar = ()=>{
     setVisible(true)
 		const respuesta = confirm("¿Desea Eliminar el Producto?")
 
@@ -13,9 +13,9 @@ function Producto({producto, setProducto, eliminarProducto}) {
       setVisible(false)
     }
 	} */
-	return (
+  return (
     <>
-      <div className=" px-5 py-5 rounded-xl shadow-xl mb-5 border-2 border-white grid grid-cols-2 ">
+      <div className=" px-5 py-5 rounded-xl shadow-xl mb-5 border-2 border-white md:grid md:grid-cols-2 block ">
         <div className="h-fit pl-5 my-auto grid grid-cols-1 gap-4">
           <p className=" font-bold text-[#06DA06] block">
             Nombre:{" "}
@@ -36,17 +36,17 @@ function Producto({producto, setProducto, eliminarProducto}) {
             <span className="font-normal text-white">{producto.date}</span>
           </p>
         </div>
-        <div className="mb-5">
+        <div className="mb-5 p-5 mt-5 md:mt-0">
           <img
             className="h-[250px] w-[250px] border border-white mx-auto "
             src={producto.image}
             alt="imagen"
           />
         </div>
-        <div className="col-span-2 w-fit mx-auto mt-3">
+        <div className="col-span-2 w-fit mx-auto text-center mt-3">
           <button
             type="button"
-            className="px-10 py-2 bg-green-600 p-3 mx-3 rounded-xl text-white hover:bg-black border border-green-600 duration-300 text-center"
+            className="px-10 py-2 bg-green-600 p-3 mx-3 rounded-xl text-white hover:bg-black border border-green-600 duration-300 text-center my-2"
             onClick={() => setProducto(producto)}
           >
             Editar
@@ -90,4 +90,4 @@ function Producto({producto, setProducto, eliminarProducto}) {
   );
 }
 
-export default Producto
+export default Producto;

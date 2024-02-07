@@ -79,16 +79,14 @@ const Formulario = ({ productos, setProductos, producto, setProducto }) => {
       } else {
         console.error("Error al cargar la imagen:", uploadImageResponse.status);
       }
-
     } else {
-
       //MODO AGREGAR
-      
+
       objetoCliente.id = generarId();
 
       const formData = new FormData();
       formData.append("image", e.target.image.files[0]);
-  
+
       const uploadImageResponse = await fetch("../api/upload-image", {
         method: "POST",
         body: formData,
@@ -120,7 +118,6 @@ const Formulario = ({ productos, setProductos, producto, setProducto }) => {
       } else {
         console.error("Error al cargar la imagen:", uploadImageResponse.status);
       }
-
     }
 
     setName("");
@@ -136,15 +133,16 @@ const Formulario = ({ productos, setProductos, producto, setProducto }) => {
     return date + aleatorio;
   };
 
-
   const handleImageUpload = (files) => {
     const file = files[0];
     setUploadedImage(file);
   };
 
-
   return (
     <div className="w-full">
+      <h2 className=" font-black text-2xl text-center text-[#06DA06] mb-10 ">
+        Formulario de Productos
+      </h2>
       <form
         className=" bg-black border-2 border-white backdrop-blur-md px-5 py-8 rounded-tl-3xl rounded-br-3xl"
         onSubmit={handlerSubmit}

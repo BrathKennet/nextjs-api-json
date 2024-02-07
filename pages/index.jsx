@@ -11,8 +11,7 @@ const Home = () => {
   const [producto, setProducto] = useState({});
 
   const eliminarProducto = async (clienteD) => {
-
-    const clienteid = clienteD.id
+    const clienteid = clienteD.id;
 
     const clientesActualizados = productos.filter(
       (producto) => producto.id != clienteid
@@ -20,7 +19,7 @@ const Home = () => {
     setProductos(clientesActualizados);
 
     const res = await fetch(`/api/product/${clienteid}`, {
-      method: "DELETE"
+      method: "DELETE",
     });
 
     const data = await res.json();
@@ -57,13 +56,7 @@ const Home = () => {
   return (
     <div className="mx-auto pt-10 px-10 bg-black min-h-screen w-full">
       <Header />
-      <div className="grid grid-cols-3 w-full">
-        <h2 className=" font-black text-2xl text-center text-[#06DA06] mb-10 ">
-          Formulario de Productos
-        </h2>
-        <h2 className=" font-black text-2xl text-center text-[#06DA06] mb-10 col-span-2">
-          Lista de Productos
-        </h2>
+      <div className="grid md:grid-cols-2 grid-cols-1 gap-8 w-full">
         {productos && (
           <>
             <Formulario
